@@ -1,36 +1,77 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 
-Stack bottomTextInput({required Widget child, void Function(String)? onChanged, void Function(String)? onSubmitted}) {
+Stack bottomTextInput({
+  required Widget child,
+  void Function(String)? onChanged,
+  void Function(String)? onSeaching,
+  void Function(String)? onSubmitted,
+}) {
   final controller = TextEditingController();
+  final stcSet = StreamController<bool>.broadcast();
+
   return Stack(
     children: [
-      child,
+      Padding(
+        padding: const EdgeInsets.only(bottom: 60.0),
+        child: StreamBuilder<bool>(
+            stream: stcSet.stream,
+            builder: (context, snapshot) {
+              return child;
+            }),
+      ),
       Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          Container(
-            margin: const EdgeInsets.all(8),
-            height: 40,
-            width: double.infinity,
-            child: TextField(
-              decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.all(4),
-                  border: const OutlineInputBorder(),
-                  suffixIcon: IconButton(
-                      onPressed: () {
-                        onSubmitted?.call(controller.text);
-                        controller.clear();
-                      },
-                      icon: const Icon(Icons.send))),
-              onSubmitted: (p0) => {
-                onSubmitted?.call(p0),
-                controller.clear(),
-              },
-              onChanged: onChanged,
-              controller: controller,
-            ),
-          ),
+          StreamBuilder<bool>(
+              stream: stcSet.stream,
+              initialData: false,
+              builder: (context, seaching) {
+                void addData() {
+                  if (!seaching.data!) {
+                    onSubmitted?.call(controller.text);
+                    controller.clear();
+                  }
+                }
+
+                return Container(
+                  margin: const EdgeInsets.all(8),
+                  height: 40,
+                  width: double.infinity,
+                  child: TextField(
+                    decoration: InputDecoration(
+                        filled: true,
+                        contentPadding: const EdgeInsets.all(4),
+                        border: const OutlineInputBorder(),
+                        prefixIcon: InkWell(
+                            onTap: () {
+                              if (seaching.data!) controller.clear();
+                              onSeaching?.call(controller.text);
+                              stcSet.add(!seaching.data!);
+                            },
+                            child: Icon(
+                              Icons.search,
+                              color: seaching.data! ? Colors.blue : Colors.grey,
+                            )),
+                        suffixIcon: IconButton(
+                            onPressed: () {
+                              addData();
+                            },
+                            icon: const Icon(Icons.send))),
+                    onSubmitted: (p0) {
+                      addData();
+                    },
+                    onChanged: (t) {
+                      if (seaching.data!) {
+                        onSeaching?.call(t);
+                        stcSet.add(true);
+                      }
+                      onChanged?.call(t);
+                    },
+                    controller: controller,
+                  ),
+                );
+              }),
         ],
       )
     ],
@@ -49,10 +90,9 @@ Expanded fetchDataLisTile<T>({
   required String Function(List<T> r, int index) callbackText,
   T Function(T, String)? onChanged,
   String Function(T)? callbacEdit,
-  Widget Function(Future<void> Function(T r) updaet, T r)? editWidget,
+  List Function(Future<void> Function(T r) updaet, T r)? editWidget,
 }) {
   var resFuture = future();
-
   return Expanded(
     child: StreamBuilder<bool>(
         stream: stcFetch.stream,
@@ -69,6 +109,9 @@ Expanded fetchDataLisTile<T>({
                   itemCount: respon.length,
                   itemBuilder: (_, index) {
                     var res = respon[index];
+                    List? edit = editWidget?.call(callbackUpdate, res);
+                    Widget? widgetEdit = edit?.first;
+                    Function onSubmitted = edit?.last;
                     return ListTile(
                       leading: Stack(
                         children: [
@@ -77,17 +120,18 @@ Expanded fetchDataLisTile<T>({
                           const Positioned(right: 0, child: Text(':', style: TextStyle(fontSize: 24))) // :
                         ],
                       ),
+                      titleAlignment: ListTileTitleAlignment.top,
                       title: status
                           ? Text(
                               callbackText(respon, index),
                               style: const TextStyle(fontSize: 24),
                             )
-                          : editWidget?.call(callbackUpdate, res) ?? const SizedBox.shrink(),
+                          : widgetEdit ?? const SizedBox.shrink(),
                       trailing: Wrap(
                         children: [
                           IconButton(
                               onPressed: () {
-                                if (!status) editWidget?.call(callbackUpdate, res);
+                                if (!status) onSubmitted();
                                 stcFetch.add(!status);
                               },
                               icon: Icon(

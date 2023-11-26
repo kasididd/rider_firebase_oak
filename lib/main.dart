@@ -9,7 +9,6 @@ export 'package:rider_firebase_oak/constant/key_const.dart';
 export 'package:rider_firebase_oak/presentation/pages/start_page.dart';
 
 void main() {
-  // const apiKey = "AIzaSyA6Re7qSlSePRJ3OgRZG-Nni6Rvdb1vFuQ";
   Firestore.initialize(projectId);
   runApp(const MyApp());
 }
