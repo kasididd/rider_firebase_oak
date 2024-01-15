@@ -1,15 +1,30 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:firedart/firestore/firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:firedart/firedart.dart';
 import 'package:rider_firebase_oak/constant/key_const.dart';
+import 'package:rider_firebase_oak/firebase_options.dart';
 import 'package:rider_firebase_oak/presentation/pages/start_page.dart';
 
-export 'package:flutter/material.dart' hide Page;
 export 'package:firedart/firedart.dart';
+export 'package:flutter/material.dart' hide Page;
 export 'package:rider_firebase_oak/constant/key_const.dart';
 export 'package:rider_firebase_oak/presentation/pages/start_page.dart';
 
-void main() {
-  Firestore.initialize(projectId);
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  if (defaultTargetPlatform != TargetPlatform.windows) {
+    // window currently don't support storage emulator
+    final emulatorHost = (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) ? '10.0.2.2' : 'localhost';
+    Firestore.initialize(projectId);
+    await FirebaseStorage.instance.useStorageEmulator(emulatorHost, 9199);
+  }
+
   runApp(const MyApp());
 }
 

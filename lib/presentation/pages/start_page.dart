@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:rider_firebase_oak/logic/class/collection_class.dart';
 import 'package:rider_firebase_oak/logic/function/api_function.dart';
+import 'package:rider_firebase_oak/logic/function/pick_file.dart';
 import 'package:rider_firebase_oak/presentation/widget/state_widget.dart';
 import 'package:rider_firebase_oak/presentation/widget/wrap_widget.dart';
 
@@ -25,17 +26,23 @@ class StartPage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                decoration: BoxDecoration(color: Colors.blueAccent, borderRadius: BorderRadius.circular(5)),
-                padding: const EdgeInsets.all(8),
-                margin: const EdgeInsets.only(top: 24),
-                child: InkWell(
-                  onTap: setFetch,
-                  child: const Text(
-                    "Data Getting List Click Refresh",
-                    style: TextStyle(color: Colors.white),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(color: Colors.blueAccent, borderRadius: BorderRadius.circular(5)),
+                    padding: const EdgeInsets.all(8),
+                    margin: const EdgeInsets.only(top: 24),
+                    child: InkWell(
+                      onTap: setFetch,
+                      child: const Text(
+                        "Data Getting List Click Refresh",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
                   ),
-                ),
+                  const ElevatedButton(onPressed: pickFile, child: Text('Upload File'))
+                ],
               ),
               fetchDataLisTile(
                 stcFetch: stcFetch,

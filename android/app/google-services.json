@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "948036574790",
+    "project_id": "fir-c288e",
+    "storage_bucket": "fir-c288e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:948036574790:android:7104e37d35fb3422e43447",
+        "android_client_info": {
+          "package_name": "com.example.rider_firebase_oak"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA3QmfKMr8WixYS1ypFbcxc9jmXX20snRM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
